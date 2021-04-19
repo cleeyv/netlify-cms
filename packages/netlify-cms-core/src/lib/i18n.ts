@@ -78,7 +78,7 @@ export const getFilePath = (
 ) => {
   switch (structure) {
     case I18N_STRUCTURE.LOCALE_FOLDERS:
-      return `${locale}/${path.trim()}`;
+      return path.replace(`content`, `content/${locale}`);
     case I18N_STRUCTURE.MULTIPLE_FOLDERS:
       return path.replace(`/${slug}`, `/${locale}/${slug}`);
     case I18N_STRUCTURE.MULTIPLE_FILES:
@@ -94,7 +94,7 @@ export const getLocaleFromPath = (structure: I18N_STRUCTURE, extension: string, 
     case I18N_STRUCTURE.LOCALE_FOLDERS: {
       const parts = path.split('/');
       // locale
-      return parts.shift();
+      return parts[1];
     }
     case I18N_STRUCTURE.MULTIPLE_FOLDERS: {
       const parts = path.split('/');
