@@ -10,6 +10,7 @@ import { Deploys } from '../reducers/deploys';
 import { Search } from '../reducers/search';
 import { GlobalUI } from '../reducers/globalUI';
 import { formatExtensions } from '../formats/formats';
+import { I18N_STRUCTURE } from '../lib/i18n';
 
 export type CmsBackendType =
   | 'azure'
@@ -60,7 +61,7 @@ export type CmsPublishMode = 'simple' | 'editorial_workflow';
 export type CmsSlugEncoding = 'unicode' | 'ascii';
 
 export interface CmsI18nConfig {
-  structure: 'multiple_folders' | 'multiple_files' | 'single_file';
+  structure: I18N_STRUCTURE;
   locales: string[];
   default_locale?: string;
 }

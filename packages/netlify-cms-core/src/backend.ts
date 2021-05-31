@@ -66,6 +66,7 @@ import {
   getI18nDataFiles,
   getI18nBackup,
   formatI18nBackup,
+  getPathWithI18n,
 } from './lib/i18n';
 
 const { extractTemplateVars, dateParsers, expandPath } = stringTemplate;
@@ -493,17 +494,15 @@ export class Backend {
   }
 
   async listEntries(collection: Collection) {
+    const folder = getPathWithI18n(collection);
+
     const extension = selectFolderEntryExtension(collection);
     let listMethod: () => Promise<ImplementationEntry[]>;
     const collectionType = collection.get('type');
     if (collectionType === FOLDER) {
       listMethod = () => {
         const depth = collectionDepth(collection);
-        return this.implementation.entriesByFolder(
-          collection.get('folder') as string,
-          extension,
-          depth,
-        );
+        return this.implementation.entriesByFolder(folder, extension, depth);
       };
     } else if (collectionType === FILES) {
       const files = collection
@@ -542,11 +541,13 @@ export class Backend {
   // returns all the collected entries. Used to retrieve all entries
   // for local searches and queries.
   async listAllEntries(collection: Collection) {
+    const folder = getPathWithI18n(collection);
+
     if (collection.get('folder') && this.implementation.allEntriesByFolder) {
       const depth = collectionDepth(collection);
       const extension = selectFolderEntryExtension(collection);
       return this.implementation
-        .allEntriesByFolder(collection.get('folder') as string, extension, depth)
+        .allEntriesByFolder(folder, extension, depth)
         .then(entries => this.processEntries(entries, collection));
     }
 

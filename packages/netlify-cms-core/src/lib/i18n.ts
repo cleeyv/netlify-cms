@@ -29,7 +29,7 @@ type I18nInfo = {
   structure: I18N_STRUCTURE;
 };
 
-export function getI18nInfo(collection: Collection) {
+export function getI18nInfo(collection: Collection): Partial<I18nInfo> {
   if (!hasI18n(collection)) {
     return {};
   }
@@ -39,10 +39,26 @@ export function getI18nInfo(collection: Collection) {
 
 export function getI18nFilesDepth(collection: Collection, depth: number) {
   const { structure } = getI18nInfo(collection) as I18nInfo;
-  if (structure === I18N_STRUCTURE.MULTIPLE_FOLDERS) {
+  if (
+    structure === I18N_STRUCTURE.MULTIPLE_FOLDERS ||
+    structure === I18N_STRUCTURE.LOCALE_FOLDERS
+  ) {
     return depth + 1;
   }
   return depth;
+}
+
+/* Do we need to inject the locale at the top level of the content path? */
+function hasTopLevelLocale(collection: Collection) {
+  return hasI18n(collection) && getI18nInfo(collection).structure === I18N_STRUCTURE.LOCALE_FOLDERS;
+}
+
+export function getPathWithI18n(collection: Collection) {
+  return hasTopLevelLocale(collection)
+    ? collection
+        .get('folder')
+        ?.replace('content/', `content/${getI18nInfo(collection).defaultLocale}/`) || ''
+    : (collection.get('folder') as string);
 }
 
 export function isFieldTranslatable(field: EntryField, locale: string, defaultLocale: string) {
@@ -129,6 +145,8 @@ export function getFilePaths(
 
 export function normalizeFilePath(structure: I18N_STRUCTURE, path: string, locale: string) {
   switch (structure) {
+    case I18N_STRUCTURE.LOCALE_FOLDERS:
+      return path.replace(`${locale}/`, '');
     case I18N_STRUCTURE.MULTIPLE_FOLDERS:
       return path.replace(`${locale}/`, '');
     case I18N_STRUCTURE.MULTIPLE_FILES:
